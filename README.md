@@ -6,6 +6,8 @@ Ajax 修改用戶圖像
 
 使用的套件
 
+Jcorp.js
+
 intervention/image
 
 laracasts/flash
