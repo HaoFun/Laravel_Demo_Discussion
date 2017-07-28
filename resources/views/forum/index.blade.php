@@ -7,7 +7,6 @@
     <div class="jumbotron">
         <h1>Hao Club Demo <a class="btn btn-lg btn-primary pull-right" href="{{ route('discussions.create') }}" role="button">發布帖子</a></h1>
     </div>
-
     <div class="container">
         <div class="row">
             <div class="col-md-9" role="main">
@@ -25,5 +24,8 @@
                 @endforeach
             </div>
         </div>
+    </div>
+    <div class="Pages" style="text-align: center">
+        {{ $discussions->render() }}
     </div>
 @endsection

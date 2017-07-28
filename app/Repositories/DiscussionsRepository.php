@@ -6,7 +6,7 @@ class DiscussionsRepository
 {
     public function getDiscussionsLatest()
     {
-        return Discussions::latest()->get(); //按資料庫內新增時間新到舊
+        return Discussions::latest()->paginate(15); //按資料庫內新增時間新到舊
     }
 
     public function getDiscussionsByID($id)

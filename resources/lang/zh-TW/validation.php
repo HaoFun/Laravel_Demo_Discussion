@@ -12,7 +12,7 @@ return [
     | such as the size rules. Feel free to tweak each of these messages.
     |
     */
-
+    'isValid'              => '該E-mail驗證無效',
     'accepted'             => '必須接受 :attribute。',
     'active_url'           => ':attribute 並非一個有效的網址。',
     'after'                => ':attribute 必須要晚於 :date。',

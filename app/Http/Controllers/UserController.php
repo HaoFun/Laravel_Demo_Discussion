@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePasswordRequest;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Validation\Validator;
 use Auth;
 use Image;
 use Hash;
@@ -27,7 +29,7 @@ class UserController extends Controller
             return redirect('/');
         }
         $user_confirm -> is_confirmed =1;
-        $user_confirm -> confirm_code = str_random(48);
+        $user_confirm -> confirm_code = str_random(64);
         $user_confirm -> save();
         return redirect('/login');
     }
@@ -37,17 +39,52 @@ class UserController extends Controller
         return view('auth.avatar');
     }
 
-    public function changeavatar(Request $request)
+    public function changeAvatar(Request $request)
     {
         $file = $request->file('avatar');
+
+        $input = array('image'=>$file);
+        $rules = array('image' => 'image');
+        $validator = \Validator::make($input,$rules);
+        if($validator -> fails())
+        {
+            return \Response::json([
+                'success' => false,
+                'errors' => $validator->getMessageBag()->toArray(),
+            ]);
+        }
+
+
         $path = 'images/avatar/';
-        $filename = Auth::user()->id.'_'.time().$file->getClientOriginalName();
+        $filename = \Auth::user()->id.'_'.time().$file->getClientOriginalName();
         $file->move($path,$filename);
-        Image::make($path.$filename)->fit(200)->save();
-        $user = $this->userRepository->getUserByID(Auth::user()->id);
-        $user ->avatar = '/'.$path.$filename;
+        Image::make($path.$filename)->resize(400, null, function ($constraint)
+        {
+            $constraint->aspectRatio();
+        })->save();
+//        $user = $this->userRepository->getUserByID(Auth::user()->id);
+//        $user ->avatar = '/'.$path.$filename;
+//        $user -> save();
+//        return redirect()->action('UserController@avatar');
+        return \Response::json([
+            'success' => true,
+            'avatar'  => asset($path.$filename),
+            'image'   => $path.$filename,
+        ]);
+    }
+
+    public function cropAvatar(Request $request)
+    {
+        $photo = $request->get('photo');
+        $width = (int)$request->get('w');
+        $height = (int)$request->get('h');
+        $xAlign = (int)$request->get('x');
+        $yAlign = (int)$request->get('y');
+        Image::make($photo)->crop($width,$height,$xAlign,$yAlign)->save();
+        $user = Auth::user();
+        $user -> avatar = asset($photo);
         $user -> save();
-        return redirect()->action('UserController@avatar');
+        return redirect('/user/avatar');
     }
 
     public function changepassword()
